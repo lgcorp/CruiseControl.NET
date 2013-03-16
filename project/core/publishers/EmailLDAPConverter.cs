@@ -102,7 +102,17 @@ namespace ThoughtWorks.CruiseControl.Core.Publishers
         /// <param name="username">The username.</param>
         /// <returns>The email address.</returns>
         public string Convert(string username)
-        {           
+        {
+            if (username.Contains("\\"))
+            {
+                //then its a DOMAIN\USERNAME
+                var tmpUsername = username.Split(new[] { '\\' });
+                username = tmpUsername[1];
+                if (tmpUsername[0].ToLower() != domainName.ToLower())
+                {
+                    return null;
+                }
+            }
             string ldapPath = @"LDAP://" + domainName;
             string ldapFilter = @"(&(objectClass=user)(SAMAccountName=" + username + "))";
             string[] ldapProperties = { ldap_Mail, ldap_QueryField };
